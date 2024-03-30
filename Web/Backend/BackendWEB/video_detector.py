@@ -8,8 +8,12 @@ from argparse import ArgumentParser
 face_cropper = cv2.CascadeClassifier(cv2.data.haarcascades +'haarcascade_frontalface_default.xml')
 
 
-embeddings_path_man = "./embeddings/man"
-embeddings_path_woman = "./embeddings/woman"
+embeddings_path_man = "./embeddings/video_emb"
+
+
+def sqrt2_norm(arr):
+    normalized_array = [value / 2**0.5 for value in arr]
+    return normalized_array
 def get_result(img):
     if img is None:
         raise Exception("No such file of directory")
@@ -31,7 +35,7 @@ def get_result(img):
             raise Exception("Corrupted file")
 
         embedings_man = os.listdir(embeddings_path_man)
-        embedings_woman = os.listdir(embeddings_path_woman)
+        #embedings_woman = os.listdir(embeddings_path_woman)
 
         d = {}
         for emb in embedings_man:
@@ -45,14 +49,14 @@ def get_result(img):
 
         res_mass = []
         for cl, emb in d.items():
-            res_mass.append((cl, np.mean(emb)))
+            res_mass.append((cl, np.min(sqrt2_norm(emb))))
 
         sorted_arr_man = sorted(res_mass, key=lambda x: x[1])
 
-        res_d_man = {'class': [cls[0].split('.')[0] for cls in sorted_arr_man[:3]],
-                     'prob': [prob[1] for prob in sorted_arr_man[:3]]}
+        res_d_man = {'class': [cls[0].split('.')[0] for cls in sorted_arr_man[:4]],
+                     'prob': [round((1-prob[1])*100, 2) for prob in sorted_arr_man[:4]]}
 
-        d = {}
+        """d = {}
         for emb in embedings_woman:
             loaded_arr = np.load(f'{embeddings_path_woman}/{emb}')
             d[emb] = []
@@ -71,10 +75,10 @@ def get_result(img):
         res_d_woman = {
             'class': [cls[0].split('.')[0] for cls in sorted_arr_woman[:3]],
             'prob': [prob[1] for prob in sorted_arr_woman[:3]]
-        }
+        }"""
 
-        res_d = {'class': res_d_man['class'] + res_d_woman['class'],
-                 'prob': res_d_man['prob'] + res_d_woman['prob']}
+        res_d = {'class': res_d_man['class'],
+                 'prob': res_d_man['prob']}
         result_list.append(((x, y, w, h), res_d))
 
     res_max = []
@@ -90,7 +94,7 @@ def get_result(img):
     return res_max
 
 def video_detect(path):
-    print('-----------------')
+
     cap = cv2.VideoCapture(path)
 
     if (cap.isOpened() == False):
@@ -109,7 +113,7 @@ def video_detect(path):
 
         count += 1
 
-        if count % 10 == 0:
+        if count % 30 == 0:
             continue
 
         res = get_result(frame)
@@ -141,4 +145,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     video_detect(args.filename)
-

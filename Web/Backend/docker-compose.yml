@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  backendweb:
+    image: ${DOCKER_REGISTRY-}backendweb
+    build:
+      context: .
+      dockerfile: BackendWEB/Dockerfile
+    ports:
+     - 8080:8080
