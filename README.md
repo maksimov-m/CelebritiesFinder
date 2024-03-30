@@ -44,9 +44,9 @@ CelebritiesFinder - сервис который позволяет посмот�
 
 ДЕМО
 --------------
-Видео на демонстрацию телеграмм бота:
-  1. Запись видео https://drive.google.com/file/d/1eiBByD-yI_b93ReqyyjB0roNL7SAKLpf/view?usp=sharing
-  2. Фотографии https://drive.google.com/file/d/118KPW3SUjXTBxfOEZZCIT85mSlyjO2LY/view?usp=sharing
+Видео на демонстрацию работы:
+  1. Запись видео в телеграмм боте https://drive.google.com/file/d/1eiBByD-yI_b93ReqyyjB0roNL7SAKLpf/view?usp=sharing
+  2. Фотографии в телеграмм боте https://drive.google.com/file/d/118KPW3SUjXTBxfOEZZCIT85mSlyjO2LY/view?usp=sharing
   3. Работа сайта https://drive.google.com/file/d/19BuvJboqB5ypjPeSClZJS8qwOqdEhLKQ/view?usp=sharing
 --------------
 
