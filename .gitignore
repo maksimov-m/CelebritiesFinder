@@ -1,0 +1,11 @@
+﻿################################################################################
+# Данный GITIGNORE-файл был автоматически создан Microsoft(R) Visual Studio.
+################################################################################
+
+/Web/Backend/.vs/BackendWEB
+/.vs
+/Web/Backend/BackendWEB/bin/Debug/net8.0
+/Web/Backend/BackendWEB/images
+/Web/Backend/BackendWEB/videos
+/Web/Backend/BackendWEB/video_2024-03-30_02-49-09.mp4
+/Web/Backend/BackendWEB/obj
