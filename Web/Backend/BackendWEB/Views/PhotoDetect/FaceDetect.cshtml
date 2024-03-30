@@ -1,0 +1,31 @@
+﻿@page
+@using BackendWEB.wwwroot.home;
+@model FaceDetectModel
+@{
+}
+
+<html>
+
+    <head>
+        <link type="text/css" href="~/lib/bootstrap/dist/css/bootstrap.css"/>
+    </head>
+
+    <body>
+
+        <div class="card">
+            <div class="card-header">
+                <h1>Загрузите свою фотографию и я расскажу вам на кого из знаминитостей вы похожи</h1>
+            </div>
+            <div class="card-body">
+            <form action="home" method="post" enctype="multipart/form-data" class="form-control">
+                    <label class="col-form-label">Файлы для отправки</label>
+                    <input type="file" name="file"/>
+                    <input type="submit" value="Отправить"/>
+                </form>
+            </div>
+           
+        </div>
+
+    </body>
+
+</html>
