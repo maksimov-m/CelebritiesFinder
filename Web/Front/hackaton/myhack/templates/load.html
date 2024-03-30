@@ -36,8 +36,8 @@
     </style>
 </head>
 <body>
-<a href="{% url 'my_view' %}" class="btn btn-primary">Назад</a>
-<button type="button" class="btn btn-primary" id="checkButton">Проверить</button>
+<a href="{% url 'my_view' %}" class="btn btn-lg btn-primary">Назад</a>
+<button type="button" class="btn btn-lg btn-primary" id="checkButton">Проверить</button>
 <button id="showImagesButton" style="display:none;">Показать изображения</button>
 <div id="imagesContainer" style="display:none;"></div>
 
@@ -98,31 +98,54 @@
                         .then(csvText => {
                             const csvData = csvText.split('\n').slice(1).map(row => row.split(';')); // Пропускаем заголовок и разбиваем строку на массив
                             console.log('csvData', csvData)
-                            for (var i = 0; i < classValues.length; i += 2) {
-                                var row = document.createElement('div');
-                                row.classList.add('row');
-                                var col1 = document.createElement('div');
-                                col1.classList.add('col-md-6');
-                                var col2 = document.createElement('div');
-                                col2.classList.add('col-md-6');
+                            if (classValues.length % 2 === 0){
+                                for (var i = 0; i < classValues.length; i += 2) {
+                                    var row = document.createElement('div');
+                                    row.classList.add('row');
+                                    var col1 = document.createElement('div');
+                                    col1.classList.add('col-md-6');
+                                    var col2 = document.createElement('div');
+                                    col2.classList.add('col-md-6');
 
-                                var cardData1 = csvData.find(item => item[0] === classValues[i]);
-                                var cardData2 = csvData.find(item => item[0] === classValues[i + 1]);
+                                    var cardData1 = csvData.find(item => item[0] === classValues[i]);
+                                    var cardData2 = csvData.find(item => item[0] === classValues[i + 1]);
 
-                                var card1 = createCard(cardData1, classPercent[i]);
-                                var card2 = createCard(cardData2, classPercent[i + 1]);
+                                    var card1 = createCard(cardData1, classPercent[i]);
+                                    var card2 = createCard(cardData2, classPercent[i + 1]);
 
-                                if (card1) {
-                                    col1.appendChild(card1);
-                                    row.appendChild(col1);
+                                    if (card1) {
+                                        col1.appendChild(card1);
+                                        row.appendChild(col1);
+                                    }
+
+                                    if (card2) {
+                                        col2.appendChild(card2);
+                                        row.appendChild(col2);
+                                    }
+
+                                    imagesContainer.appendChild(row);
                                 }
+                            }
+                            else
+                            {
+                                for (var i = 0; i < classValues.length; i++) {
+                                    var row = document.createElement('div');
+                                    row.classList.add('row');
+                                    var col1 = document.createElement('div');
+                                    col1.classList.add('col-md-6');
+                                    var col2 = document.createElement('div');
+                                    col2.classList.add('col-md-6');
 
-                                if (card2) {
-                                    col2.appendChild(card2);
-                                    row.appendChild(col2);
+                                    var cardData1 = csvData.find(item => item[0] === classValues[i]);
+
+                                    var card1 = createCard(cardData1, classPercent[i]);
+
+                                    if (card1) {
+                                        col1.appendChild(card1);
+                                        row.appendChild(col1);
+                                    }
+                                    imagesContainer.appendChild(row);
                                 }
-
-                                imagesContainer.appendChild(row);
                             }
                             imagesContainer.style.display = 'block';
                             showImagesButton.style.display = 'none'; // Скрытие кнопки "Показать изображения"
@@ -142,6 +165,11 @@
         card.classList.add('card');
         var img = document.createElement('img');
         img.classList.add('card-img-top');
+        console.log('data',data);
+        if (data[0] == undefined)
+        {
+            data[0] = '15';
+        }
         img.src = '../dataset_hack/' + data[0] + '/1.jpg'; // Предполагаем, что id изображения соответствует id в CSV
         img.alt = 'Image';
         var cardBody = document.createElement('div');
