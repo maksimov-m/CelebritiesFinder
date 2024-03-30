@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Проверка</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #152f1e; /* Темно-зеленый фон */
+            color: #ffffff; /* Белый текст */
+            padding: 20px;
+        }
+        .card {
+            background-color: #1f3d28; /* Цвет карточки */
+            margin-bottom: 20px;
+            margin-left: 60px;
+            width: 700px; /* Ширина карточки */
+            height: 1100px; /* Высота карточки */
+        }
+        .card-img-top {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Сохраняет пропорции изображения и заполняет доступное пространство без обрезки */
+        }
+        .card-title, .card-text {
+            color: #ffffff; /* Белый текст */
+        }
+        .btn-primary {
+            background-color: #5cb85c; /* Зеленая кнопка */
+            border-color: #5cb85c; /* Цвет рамки кнопки */
+        }
+        .btn-primary:hover {
+            background-color: #4cae4c; /* Цвет при наведении на кнопку */
+            border-color: #4cae4c; /* Цвет рамки при наведении на кнопку */
+        }
+    </style>
+</head>
+<body>
+<a href="{% url 'my_view' %}" class="btn btn-lg btn-primary">Назад</a>
+<button type="button" class="btn btn-lg btn-primary" id="checkButton">Проверить</button>
+<button id="showImagesButton" style="display:none;">Показать изображения</button>
+<div id="imagesContainer" style="display:none;"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM загружен');
+
+        var checkButton = document.getElementById('checkButton');
+        var showImagesButton = document.getElementById('showImagesButton');
+        var imagesContainer = document.getElementById('imagesContainer');
+
+        console.log('Проверка элементов DOM:', checkButton, showImagesButton, imagesContainer);
+
+        if (checkButton && showImagesButton && imagesContainer) {
+            checkButton.addEventListener('click', function() {
+                console.log('Кнопка "Проверить" нажата');
+                var ses_id = '{{ ses_id }}';
+                console.log('Значение переменной "ses_id":', ses_id);
+                var url = 'http://26.221.175.97:5116/api/isReady?id=' + ses_id;
+                console.log('URL запроса:', url);
+                fetch(url, { method: 'POST', headers: { accept: "text/plain" } })
+                    .then(response => response.json()) // Получение JSON-ответа
+                    .then(data => {
+                        console.log('Результат запроса:', data); // Вывод данных в консоль
+                        const datavalue = data.data;
+                        const regex = /'class': \[([0-9', ]*|'])/;
+                        const regex_percent = /'prob': \[([0-9',. ]*|'])/;
+                        const match = datavalue.match(regex);
+                        const match_percent = datavalue.match(regex_percent);
+                        if (match) {
+                            const classValues = match[1].split(',').map(value => value.trim().replace(/'/g, ''));
+                            const classPercent = match_percent[1].split(',').map(value => value.trim().replace(/'/g, ''));
+                            console.log('classValues:', classValues);
+                            if (data.isReady) {
+                                showImagesButton.style.display = 'block';
+                                showImagesButton.dataset.classValues = JSON.stringify(classValues);
+                                showImagesButton.dataset.classPercent = JSON.stringify(classPercent);
+                            } else {
+                                console.log('Результат запроса не true');
+                            }
+                        } else {
+                            console.log('Не удалось извлечь значения классов');
+                        }
+                    })
+                    .catch(error => console.error('Ошибка fetch:', error)); // Обработка ошибок
+            });
+
+            showImagesButton.addEventListener('click', function() {
+                var classValues = showImagesButton.dataset.classValues;
+                var classPercent = showImagesButton.dataset.classPercent;
+                if (classValues) {
+                    classValues = JSON.parse(classValues);
+                    classPercent = JSON.parse(classPercent);
+                    imagesContainer.innerHTML = '';
+
+                    fetch('../dataset_hack/ussr_russia.csv')
+                        .then(response => response.text()) // Получение текстового содержимого файла
+                        .then(csvText => {
+                            const csvData = csvText.split('\n').slice(1).map(row => row.split(';')); // Пропускаем заголовок и разбиваем строку на массив
+                            console.log('csvData', csvData)
+                            if (classValues.length % 2 === 0){
+                                for (var i = 0; i < classValues.length; i += 2) {
+                                    var row = document.createElement('div');
+                                    row.classList.add('row');
+                                    var col1 = document.createElement('div');
+                                    col1.classList.add('col-md-6');
+                                    var col2 = document.createElement('div');
+                                    col2.classList.add('col-md-6');
+
+                                    var cardData1 = csvData.find(item => item[0] === classValues[i]);
+                                    var cardData2 = csvData.find(item => item[0] === classValues[i + 1]);
+
+                                    var card1 = createCard(cardData1, classPercent[i]);
+                                    var card2 = createCard(cardData2, classPercent[i + 1]);
+
+                                    if (card1) {
+                                        col1.appendChild(card1);
+                                        row.appendChild(col1);
+                                    }
+
+                                    if (card2) {
+                                        col2.appendChild(card2);
+                                        row.appendChild(col2);
+                                    }
+
+                                    imagesContainer.appendChild(row);
+                                }
+                            }
+                            else
+                            {
+                                for (var i = 0; i < classValues.length; i++) {
+                                    var row = document.createElement('div');
+                                    row.classList.add('row');
+                                    var col1 = document.createElement('div');
+                                    col1.classList.add('col-md-6');
+                                    var col2 = document.createElement('div');
+                                    col2.classList.add('col-md-6');
+
+                                    var cardData1 = csvData.find(item => item[0] === classValues[i]);
+
+                                    var card1 = createCard(cardData1, classPercent[i]);
+
+                                    if (card1) {
+                                        col1.appendChild(card1);
+                                        row.appendChild(col1);
+                                    }
+                                    imagesContainer.appendChild(row);
+                                }
+                            }
+                            imagesContainer.style.display = 'block';
+                            showImagesButton.style.display = 'none'; // Скрытие кнопки "Показать изображения"
+                        })
+                        .catch(error => console.error('Ошибка загрузки CSV файла:', error));
+                } else {
+                    console.log('Не найдены значения классов');
+                }
+            });
+        } else {
+            console.error('Не удалось найти один из элементов DOM.');
+        }
+    });
+
+    function createCard(data, percent) {
+        var card = document.createElement('div');
+        card.classList.add('card');
+        var img = document.createElement('img');
+        img.classList.add('card-img-top');
+        console.log('data',data);
+        if (data[0] == undefined)
+        {
+            data[0] = '15';
+        }
+        img.src = '../dataset_hack/' + data[0] + '/1.jpg'; // Предполагаем, что id изображения соответствует id в CSV
+        img.alt = 'Image';
+        var cardBody = document.createElement('div');
+        cardBody.classList.add('card-body');
+        var title = document.createElement('h5');
+        title.classList.add('card-title');
+        title.textContent = data[1]; // Имя из CSV
+        var text = document.createElement('p');
+        text.classList.add('card-text');
+        text.innerHTML = '<b>Процент схожести:</b> ' + percent+'%' + '<br>' +
+            '<b>Specialization:</b> ' + data[3] + '<br>' +
+            '<b>Films Years:</b> ' + data[4]  + '<br>' +
+            '<b>Link:</b> <a href="' + data[2] + '">' + data[2] + '</a>'; // Создание кликабельной ссылки
+
+        cardBody.appendChild(title);
+        cardBody.appendChild(text);
+        card.appendChild(img);
+        card.appendChild(cardBody);
+
+        return card;
+    }
+</script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+</html>

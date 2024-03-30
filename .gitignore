@@ -9,6 +9,12 @@
 /Web/Backend/BackendWEB/videos
 /Web/Backend/BackendWEB/video_2024-03-30_02-49-09.mp4
 /Web/Backend/BackendWEB/obj
+<<<<<<< HEAD
 /Web/Backend/.vs/ProjectEvaluation
 /Web/Backend/bin/Debug
 /Web/Backend/obj
+=======
+/TelegramBot/.idea
+/TelegramBot/data
+*.zip
+>>>>>>> c835f277860ba56812eb2750c7597cadceb0a501
